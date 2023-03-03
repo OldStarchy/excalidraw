@@ -27,7 +27,7 @@ import { DuplicateIcon } from "../components/icons";
 export const actionDuplicateSelection = register({
   name: "duplicateSelection",
   trackEvent: { category: "element" },
-  perform: (elements, appState) => {
+  perform: (elements, _layers, appState) => {
     // duplicate selected point(s) if editing a line
     if (appState.editingLinearElement) {
       const ret = LinearElementEditor.duplicateSelectedPoints(appState);

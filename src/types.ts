@@ -14,6 +14,7 @@ import {
   ExcalidrawImageElement,
   Theme,
   StrokeRoundness,
+  ExcalidrawLayer,
 } from "./element/types";
 import { SHAPES } from "./shapes";
 import { Point as RoughPoint } from "roughjs/bin/geometry";
@@ -148,6 +149,7 @@ export type AppState = {
   currentItemStartArrowhead: Arrowhead | null;
   currentItemEndArrowhead: Arrowhead | null;
   currentItemRoundness: StrokeRoundness;
+  currentLayerId: string | null;
   viewBackgroundColor: string;
   scrollX: number;
   scrollY: number;
@@ -342,6 +344,7 @@ export interface ExcalidrawProps {
 
 export type SceneData = {
   elements?: ImportedDataState["elements"];
+  layers?: ImportedDataState["layers"];
   appState?: ImportedDataState["appState"];
   collaborators?: Map<string, Collaborator>;
   commitToHistory?: boolean;
@@ -357,12 +360,14 @@ export type ExportOpts = {
   saveFileToDisk?: boolean;
   onExportToBackend?: (
     exportedElements: readonly NonDeletedExcalidrawElement[],
+    exportedLayers: readonly ExcalidrawLayer[],
     appState: AppState,
     files: BinaryFiles,
     canvas: HTMLCanvasElement | null,
   ) => void;
   renderCustomUI?: (
     exportedElements: readonly NonDeletedExcalidrawElement[],
+    exportedLayers: readonly ExcalidrawLayer[],
     appState: AppState,
     files: BinaryFiles,
     canvas: HTMLCanvasElement | null,
@@ -504,6 +509,7 @@ export type ExcalidrawImperativeAPI = {
   };
   scrollToContent: InstanceType<typeof App>["scrollToContent"];
   getSceneElements: InstanceType<typeof App>["getSceneElements"];
+  getLayers: InstanceType<typeof App>["getLayers"];
   getAppState: () => InstanceType<typeof App>["state"];
   getFiles: () => InstanceType<typeof App>["files"];
   refresh: InstanceType<typeof App>["refresh"];

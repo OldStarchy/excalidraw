@@ -10,14 +10,14 @@ export const actionToggleLinearEditor = register({
   trackEvent: {
     category: "element",
   },
-  predicate: (elements, appState) => {
+  predicate: (elements, _layers, appState) => {
     const selectedElements = getSelectedElements(elements, appState);
     if (selectedElements.length === 1 && isLinearElement(selectedElements[0])) {
       return true;
     }
     return false;
   },
-  perform(elements, appState, _, app) {
+  perform(elements, _layers, appState, _, app) {
     const selectedElement = getSelectedElements(
       getNonDeletedElements(elements),
       appState,

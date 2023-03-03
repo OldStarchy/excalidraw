@@ -4,7 +4,11 @@ import {
 } from "../scene/export";
 import { getDefaultAppState } from "../appState";
 import { AppState, BinaryFiles } from "../types";
-import { ExcalidrawElement, NonDeleted } from "../element/types";
+import {
+  ExcalidrawElement,
+  ExcalidrawLayer,
+  NonDeleted,
+} from "../element/types";
 import { getNonDeletedElements } from "../element";
 import { restore } from "../data/restore";
 import { MIME_TYPES } from "../constants";
@@ -20,6 +24,7 @@ export { MIME_TYPES };
 
 type ExportOpts = {
   elements: readonly NonDeleted<ExcalidrawElement>[];
+  layers: readonly ExcalidrawLayer[];
   appState?: Partial<Omit<AppState, "offsetTop" | "offsetLeft">>;
   files: BinaryFiles | null;
   maxWidthOrHeight?: number;
@@ -31,6 +36,7 @@ type ExportOpts = {
 
 export const exportToCanvas = ({
   elements,
+  layers,
   appState,
   files,
   maxWidthOrHeight,
@@ -39,14 +45,15 @@ export const exportToCanvas = ({
 }: ExportOpts & {
   exportPadding?: number;
 }) => {
-  const { elements: restoredElements, appState: restoredAppState } = restore(
-    { elements, appState },
-    null,
-    null,
-  );
+  const {
+    elements: restoredElements,
+    layers: restoredLayers,
+    appState: restoredAppState,
+  } = restore({ elements, layers, appState }, null, null, null);
   const { exportBackground, viewBackgroundColor } = restoredAppState;
   return _exportToCanvas(
     getNonDeletedElements(restoredElements),
+    restoredLayers,
     { ...restoredAppState, offsetTop: 0, offsetLeft: 0, width: 0, height: 0 },
     files || {},
     { exportBackground, exportPadding, viewBackgroundColor },
@@ -133,6 +140,7 @@ export const exportToBlob = async (
             blob,
             metadata: serializeAsJSON(
               opts.elements,
+              opts.layers,
               opts.appState,
               opts.files || {},
               "local",
@@ -149,19 +157,21 @@ export const exportToBlob = async (
 
 export const exportToSvg = async ({
   elements,
+  layers,
   appState = getDefaultAppState(),
   files = {},
   exportPadding,
 }: Omit<ExportOpts, "getDimensions"> & {
   exportPadding?: number;
 }): Promise<SVGSVGElement> => {
-  const { elements: restoredElements, appState: restoredAppState } = restore(
-    { elements, appState },
-    null,
-    null,
-  );
+  const {
+    elements: restoredElements,
+    layers: restoredLayers,
+    appState: restoredAppState,
+  } = restore({ elements, layers, appState }, null, null, null);
   return _exportToSvg(
     getNonDeletedElements(restoredElements),
+    restoredLayers,
     {
       ...restoredAppState,
       exportPadding,

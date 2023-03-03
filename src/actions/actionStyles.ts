@@ -26,7 +26,7 @@ export let copiedStyles: string = "{}";
 export const actionCopyStyles = register({
   name: "copyStyles",
   trackEvent: { category: "element" },
-  perform: (elements, appState) => {
+  perform: (elements, _layers, appState) => {
     const elementsCopied = [];
     const element = elements.find((el) => appState.selectedElementIds[el.id]);
     elementsCopied.push(element);
@@ -53,7 +53,7 @@ export const actionCopyStyles = register({
 export const actionPasteStyles = register({
   name: "pasteStyles",
   trackEvent: { category: "element" },
-  perform: (elements, appState) => {
+  perform: (elements, _layers, appState) => {
     const elementsCopied = JSON.parse(copiedStyles);
     const pastedElement = elementsCopied[0];
     const boundTextElement = elementsCopied[1];

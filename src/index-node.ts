@@ -1,5 +1,6 @@
 import { exportToCanvas } from "./scene/export";
 import { getDefaultAppState } from "./appState";
+import { ExcalidrawLayer } from "./element/types";
 
 const { registerFont, createCanvas } = require("canvas");
 
@@ -54,11 +55,24 @@ const elements = [
   },
 ];
 
+const layers: ExcalidrawLayer[] = [
+  {
+    id: "alskjfalwefjwlafjlwijfew",
+    name: "Default",
+    locked: false,
+    visible: true,
+    version: 1,
+    updated: 0,
+    versionNonce: 0,
+  },
+];
+
 registerFont("./public/Virgil.woff2", { family: "Virgil" });
 registerFont("./public/Cascadia.woff2", { family: "Cascadia" });
 
 const canvas = exportToCanvas(
   elements as any,
+  layers,
   {
     ...getDefaultAppState(),
     offsetTop: 0,

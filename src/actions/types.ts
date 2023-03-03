@@ -1,5 +1,5 @@
 import React from "react";
-import { ExcalidrawElement } from "../element/types";
+import { ExcalidrawElement, ExcalidrawLayer } from "../element/types";
 import {
   AppClassProperties,
   AppState,
@@ -13,6 +13,7 @@ export type ActionSource = "ui" | "keyboard" | "contextMenu" | "api";
 export type ActionResult =
   | {
       elements?: readonly ExcalidrawElement[] | null;
+      layers?: readonly ExcalidrawLayer[] | null;
       appState?: MarkOptional<
         AppState,
         "offsetTop" | "offsetLeft" | "width" | "height"
@@ -26,6 +27,7 @@ export type ActionResult =
 
 type ActionFn = (
   elements: readonly ExcalidrawElement[],
+  layers: readonly ExcalidrawLayer[],
   appState: Readonly<AppState>,
   formData: any,
   app: AppClassProperties,
@@ -117,6 +119,7 @@ export type ActionName =
 
 export type PanelComponentProps = {
   elements: readonly ExcalidrawElement[];
+  layers: readonly ExcalidrawLayer[];
   appState: AppState;
   updateData: (formData?: any) => void;
   appProps: ExcalidrawProps;
@@ -141,6 +144,7 @@ export interface Action {
       ) => string);
   predicate?: (
     elements: readonly ExcalidrawElement[],
+    layers: readonly ExcalidrawLayer[],
     appState: AppState,
     appProps: ExcalidrawProps,
     app: AppClassProperties,

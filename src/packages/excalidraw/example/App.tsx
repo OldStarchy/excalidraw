@@ -170,7 +170,7 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
 
   const loadSceneOrLibrary = async () => {
     const file = await fileOpen({ description: "Excalidraw or library file" });
-    const contents = await loadSceneOrLibraryFromBlob(file, null, null);
+    const contents = await loadSceneOrLibraryFromBlob(file, null, null, null);
     if (contents.type === MIME_TYPES.excalidraw) {
       excalidrawAPI?.updateScene(contents.data as any);
     } else if (contents.type === MIME_TYPES.excalidrawlib) {
@@ -213,10 +213,22 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
               type: ROUNDNESS.ADAPTIVE_RADIUS,
               value: 32,
             },
+            layerId: "alwkjfalwijfalwijfawlifj",
           },
         ],
         null,
       ),
+      layers: [
+        {
+          id: "alwkjfalwijfalwijfawlifj",
+          name: "Default",
+          visible: true,
+          locked: false,
+          version: 1,
+          versionNonce: 0,
+          updated: 0,
+        },
+      ],
       appState: {
         viewBackgroundColor: "#edf2ff",
       },
@@ -253,6 +265,7 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
     }
     await exportToClipboard({
       elements: excalidrawAPI.getSceneElements(),
+      layers: excalidrawAPI.getLayers(),
       appState: excalidrawAPI.getAppState(),
       files: excalidrawAPI.getFiles(),
       type,
@@ -744,6 +757,7 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
               }
               const svg = await exportToSvg({
                 elements: excalidrawAPI?.getSceneElements(),
+                layers: excalidrawAPI?.getLayers(),
                 appState: {
                   ...initialData.appState,
                   exportWithDarkMode,
@@ -768,6 +782,7 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
               }
               const blob = await exportToBlob({
                 elements: excalidrawAPI?.getSceneElements(),
+                layers: excalidrawAPI?.getLayers(),
                 mimeType: "image/png",
                 appState: {
                   ...initialData.appState,
@@ -792,6 +807,7 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
               }
               const canvas = await exportToCanvas({
                 elements: excalidrawAPI.getSceneElements(),
+                layers: excalidrawAPI.getLayers(),
                 appState: {
                   ...initialData.appState,
                   exportWithDarkMode,

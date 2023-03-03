@@ -9,7 +9,11 @@ import { restore } from "../../data/restore";
 import { ImportedDataState } from "../../data/types";
 import { isInvisiblySmallElement } from "../../element/sizeHelpers";
 import { isInitializedImageElement } from "../../element/typeChecks";
-import { ExcalidrawElement, FileId } from "../../element/types";
+import {
+  ExcalidrawElement,
+  ExcalidrawLayer,
+  FileId,
+} from "../../element/types";
 import { t } from "../../i18n";
 import {
   AppState,
@@ -263,16 +267,18 @@ export const loadScene = async (
       await importFromBackend(id, privateKey),
       localDataState?.appState,
       localDataState?.elements,
+      localDataState?.layers,
       { repairBindings: true },
     );
   } else {
-    data = restore(localDataState || null, null, null, {
+    data = restore(localDataState || null, null, null, null, {
       repairBindings: true,
     });
   }
 
   return {
     elements: data.elements,
+    layers: data.layers,
     appState: data.appState,
     // note: this will always be empty because we're not storing files
     // in the scene database/localStorage, and instead fetch them async
@@ -284,6 +290,7 @@ export const loadScene = async (
 
 export const exportToBackend = async (
   elements: readonly ExcalidrawElement[],
+  layers: readonly ExcalidrawLayer[],
   appState: AppState,
   files: BinaryFiles,
 ) => {
@@ -291,7 +298,7 @@ export const exportToBackend = async (
 
   const payload = await compressData(
     new TextEncoder().encode(
-      serializeAsJSON(elements, appState, files, "database"),
+      serializeAsJSON(elements, layers, appState, files, "database"),
     ),
     { encryptionKey },
   );

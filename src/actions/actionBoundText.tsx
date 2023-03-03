@@ -26,11 +26,11 @@ export const actionUnbindText = register({
   name: "unbindText",
   contextItemLabel: "labels.unbindText",
   trackEvent: { category: "element" },
-  predicate: (elements, appState) => {
+  predicate: (elements, _layers, appState) => {
     const selectedElements = getSelectedElements(elements, appState);
     return selectedElements.some((element) => hasBoundTextElement(element));
   },
-  perform: (elements, appState) => {
+  perform: (elements, _layers, appState) => {
     const selectedElements = getSelectedElements(
       getNonDeletedElements(elements),
       appState,
@@ -75,7 +75,7 @@ export const actionBindText = register({
   name: "bindText",
   contextItemLabel: "labels.bindText",
   trackEvent: { category: "element" },
-  predicate: (elements, appState) => {
+  predicate: (elements, _layers, appState) => {
     const selectedElements = getSelectedElements(elements, appState);
 
     if (selectedElements.length === 2) {
@@ -99,7 +99,7 @@ export const actionBindText = register({
     }
     return false;
   },
-  perform: (elements, appState) => {
+  perform: (elements, _layers, appState) => {
     const selectedElements = getSelectedElements(
       getNonDeletedElements(elements),
       appState,

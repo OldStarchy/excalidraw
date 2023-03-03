@@ -1,10 +1,12 @@
 import {
   ExcalidrawElement,
+  ExcalidrawLayer,
   NonDeletedExcalidrawElement,
   NonDeleted,
 } from "../element/types";
 import { getNonDeletedElements, isNonDeletedElement } from "../element";
 import { LinearElementEditor } from "../element/linearElementEditor";
+import { randomId } from "../random";
 
 type ElementIdKey = InstanceType<typeof LinearElementEditor>["elementId"];
 type ElementKey = ExcalidrawElement | ElementIdKey;
@@ -47,6 +49,18 @@ class Scene {
     return this.sceneMapByElement.get(elementKey) || null;
   }
 
+  static getDefaultLayer(): ExcalidrawLayer {
+    return {
+      id: randomId(),
+      name: "Default",
+      visible: true,
+      locked: false,
+      version: 1,
+      versionNonce: 0,
+      updated: 0,
+    };
+  }
+
   // ---------------------------------------------------------------------------
   // instance methods/props
   // ---------------------------------------------------------------------------
@@ -56,6 +70,20 @@ class Scene {
   private nonDeletedElements: readonly NonDeletedExcalidrawElement[] = [];
   private elements: readonly ExcalidrawElement[] = [];
   private elementsMap = new Map<ExcalidrawElement["id"], ExcalidrawElement>();
+  private layers: readonly ExcalidrawLayer[] = [];
+  private layersMap = new Map<ExcalidrawLayer["id"], ExcalidrawLayer>();
+
+  constructor() {
+    this.replaceAllLayers([Scene.getDefaultLayer()]);
+  }
+
+  getLayers(): readonly ExcalidrawLayer[] {
+    return this.layers;
+  }
+
+  getLayer(id: ExcalidrawLayer["id"]): ExcalidrawLayer | null {
+    return this.layersMap.get(id) || null;
+  }
 
   getElementsIncludingDeleted() {
     return this.elements;
@@ -119,6 +147,15 @@ class Scene {
     this.informMutation();
   }
 
+  replaceAllLayers(nextLayers: readonly ExcalidrawLayer[]) {
+    this.layers = nextLayers;
+    this.layersMap.clear();
+    nextLayers.forEach((layer) => {
+      this.layersMap.set(layer.id, layer);
+    });
+    this.informMutation();
+  }
+
   informMutation() {
     for (const callback of Array.from(this.callbacks)) {
       callback();
@@ -167,6 +204,22 @@ class Scene {
 
   getElementIndex(elementId: string) {
     return this.elements.findIndex((element) => element.id === elementId);
+  }
+
+  insertLayerAtIndex(layer: ExcalidrawLayer, index: number) {
+    if (!Number.isFinite(index) || index < 0) {
+      throw new Error("insertLayerAtIndex can only be called with index >= 0");
+    }
+    const nextLayers = [
+      ...this.layers.slice(0, index),
+      layer,
+      ...this.layers.slice(index),
+    ];
+    this.replaceAllLayers(nextLayers);
+  }
+
+  getLayerIndex(layerId: ExcalidrawLayer["id"]) {
+    return this.layers.findIndex((layer) => layer.id === layerId);
   }
 }
 

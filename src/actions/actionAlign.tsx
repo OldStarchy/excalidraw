@@ -44,7 +44,7 @@ const alignSelectedElements = (
 export const actionAlignTop = register({
   name: "alignTop",
   trackEvent: { category: "element" },
-  perform: (elements, appState) => {
+  perform: (elements, layers, appState) => {
     return {
       appState,
       elements: alignSelectedElements(elements, appState, {
@@ -74,7 +74,7 @@ export const actionAlignTop = register({
 export const actionAlignBottom = register({
   name: "alignBottom",
   trackEvent: { category: "element" },
-  perform: (elements, appState) => {
+  perform: (elements, _layers, appState) => {
     return {
       appState,
       elements: alignSelectedElements(elements, appState, {
@@ -104,7 +104,7 @@ export const actionAlignBottom = register({
 export const actionAlignLeft = register({
   name: "alignLeft",
   trackEvent: { category: "element" },
-  perform: (elements, appState) => {
+  perform: (elements, _layers, appState) => {
     return {
       appState,
       elements: alignSelectedElements(elements, appState, {
@@ -135,7 +135,7 @@ export const actionAlignRight = register({
   name: "alignRight",
   trackEvent: { category: "element" },
 
-  perform: (elements, appState) => {
+  perform: (elements, _layers, appState) => {
     return {
       appState,
       elements: alignSelectedElements(elements, appState, {
@@ -166,7 +166,7 @@ export const actionAlignVerticallyCentered = register({
   name: "alignVerticallyCentered",
   trackEvent: { category: "element" },
 
-  perform: (elements, appState) => {
+  perform: (elements, _layers, appState) => {
     return {
       appState,
       elements: alignSelectedElements(elements, appState, {
@@ -192,7 +192,7 @@ export const actionAlignVerticallyCentered = register({
 export const actionAlignHorizontallyCentered = register({
   name: "alignHorizontallyCentered",
   trackEvent: { category: "element" },
-  perform: (elements, appState) => {
+  perform: (elements, _layers, appState) => {
     return {
       appState,
       elements: alignSelectedElements(elements, appState, {

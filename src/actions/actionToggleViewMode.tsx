@@ -8,7 +8,7 @@ export const actionToggleViewMode = register({
     category: "canvas",
     predicate: (appState) => !appState.viewModeEnabled,
   },
-  perform(elements, appState) {
+  perform(elements, _layers, appState) {
     return {
       appState: {
         ...appState,
@@ -18,7 +18,7 @@ export const actionToggleViewMode = register({
     };
   },
   checked: (appState) => appState.viewModeEnabled,
-  predicate: (elements, appState, appProps) => {
+  predicate: (elements, _layers, appState, appProps) => {
     return typeof appProps.viewModeEnabled === "undefined";
   },
   contextItemLabel: "labels.viewMode",

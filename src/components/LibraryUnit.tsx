@@ -38,6 +38,8 @@ export const LibraryUnit = ({
       }
       const svg = await exportToSvg(
         elements,
+        //TODO: What layers to put here?
+        [],
         {
           exportBackground: false,
           viewBackgroundColor: oc.white,

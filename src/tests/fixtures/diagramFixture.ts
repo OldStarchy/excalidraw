@@ -2,6 +2,7 @@ import { VERSIONS } from "../../constants";
 import {
   diamondFixture,
   ellipseFixture,
+  layerFixture,
   rectangleFixture,
 } from "./elementFixture";
 
@@ -27,6 +28,7 @@ export const diagramFactory = ({
     { ...ellipseFixture, ...elementOverrides },
     { ...rectangleFixture, ...elementOverrides },
   ],
+  layers: [layerFixture],
   ...overrides,
 });
 

@@ -41,7 +41,7 @@ const enableActionFlipVertical = (
 export const actionFlipHorizontal = register({
   name: "flipHorizontal",
   trackEvent: { category: "element" },
-  perform: (elements, appState) => {
+  perform: (elements, _layers, appState) => {
     return {
       elements: flipSelectedElements(elements, appState, "horizontal"),
       appState,
@@ -50,14 +50,14 @@ export const actionFlipHorizontal = register({
   },
   keyTest: (event) => event.shiftKey && event.code === "KeyH",
   contextItemLabel: "labels.flipHorizontal",
-  predicate: (elements, appState) =>
+  predicate: (elements, _layers, appState) =>
     enableActionFlipHorizontal(elements, appState),
 });
 
 export const actionFlipVertical = register({
   name: "flipVertical",
   trackEvent: { category: "element" },
-  perform: (elements, appState) => {
+  perform: (elements, _layers, appState) => {
     return {
       elements: flipSelectedElements(elements, appState, "vertical"),
       appState,
@@ -67,7 +67,7 @@ export const actionFlipVertical = register({
   keyTest: (event) =>
     event.shiftKey && event.code === "KeyV" && !event[KEYS.CTRL_OR_CMD],
   contextItemLabel: "labels.flipVertical",
-  predicate: (elements, appState) =>
+  predicate: (elements, _layers, appState) =>
     enableActionFlipVertical(elements, appState),
 });
 

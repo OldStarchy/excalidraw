@@ -248,7 +248,7 @@ export const isLocalLink = (link: string | null) => {
 
 export const actionLink = register({
   name: "hyperlink",
-  perform: (elements, appState) => {
+  perform: (elements, _layers, appState) => {
     if (appState.showHyperlinkPopup === "editor") {
       return false;
     }
@@ -267,7 +267,7 @@ export const actionLink = register({
   keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === KEYS.K,
   contextItemLabel: (elements, appState) =>
     getContextMenuLabel(elements, appState),
-  predicate: (elements, appState) => {
+  predicate: (elements, _layers, appState) => {
     const selectedElements = getSelectedElements(elements, appState);
     return selectedElements.length === 1;
   },

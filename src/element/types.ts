@@ -64,6 +64,7 @@ type _ExcalidrawElementBase = Readonly<{
   link: string | null;
   locked: boolean;
   customData?: Record<string, any>;
+  layerId: string | null;
 }>;
 
 export type ExcalidrawSelectionElement = _ExcalidrawElementBase & {
@@ -188,3 +189,14 @@ export type ExcalidrawFreeDrawElement = _ExcalidrawElementBase &
   }>;
 
 export type FileId = string & { _brand: "FileId" };
+
+export type ExcalidrawLayer = {
+  id: string;
+  name: string;
+  visible: boolean;
+  locked: boolean;
+
+  version: number;
+  versionNonce: number;
+  updated: number;
+};

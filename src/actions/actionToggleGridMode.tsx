@@ -10,7 +10,7 @@ export const actionToggleGridMode = register({
     category: "canvas",
     predicate: (appState) => !appState.gridSize,
   },
-  perform(elements, appState) {
+  perform(elements, _layers, appState) {
     return {
       appState: {
         ...appState,
@@ -20,7 +20,7 @@ export const actionToggleGridMode = register({
     };
   },
   checked: (appState: AppState) => appState.gridSize !== null,
-  predicate: (element, appState, props) => {
+  predicate: (element, layers, appState, props) => {
     return typeof props.gridModeEnabled === "undefined";
   },
   contextItemLabel: "labels.showGrid",

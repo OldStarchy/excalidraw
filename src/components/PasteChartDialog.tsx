@@ -32,6 +32,7 @@ const ChartPreviewBtn = (props: {
       props.spreadsheet,
       0,
       0,
+      "main",
     );
     setChartElements(elements);
     let svg: SVGSVGElement;
@@ -40,6 +41,17 @@ const ChartPreviewBtn = (props: {
     (async () => {
       svg = await exportToSvg(
         elements,
+        [
+          {
+            id: "main",
+            name: "main",
+            visible: true,
+            locked: false,
+            version: 1,
+            versionNonce: 0,
+            updated: 0,
+          },
+        ],
         {
           exportBackground: false,
           viewBackgroundColor: oc.white,

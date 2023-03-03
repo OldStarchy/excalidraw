@@ -152,6 +152,7 @@ import {
   FileId,
   NonDeletedExcalidrawElement,
   ExcalidrawTextContainer,
+  ExcalidrawLayer,
 } from "../element/types";
 import { getCenter, getDistance } from "../gesture";
 import {
@@ -305,12 +306,18 @@ const ExcalidrawElementsContext = React.createContext<
 >([]);
 ExcalidrawElementsContext.displayName = "ExcalidrawElementsContext";
 
+const ExcalidrawLayersContext = React.createContext<readonly ExcalidrawLayer[]>(
+  [],
+);
+ExcalidrawElementsContext.displayName = "ExcalidrawLayersContext";
+
 const ExcalidrawAppStateContext = React.createContext<AppState>({
   ...getDefaultAppState(),
   width: 0,
   height: 0,
   offsetLeft: 0,
   offsetTop: 0,
+  currentLayerId: "",
 });
 ExcalidrawAppStateContext.displayName = "ExcalidrawAppStateContext";
 
@@ -331,6 +338,7 @@ export const useExcalidrawContainer = () =>
   useContext(ExcalidrawContainerContext);
 export const useExcalidrawElements = () =>
   useContext(ExcalidrawElementsContext);
+export const useExcalidrawLayers = () => useContext(ExcalidrawLayersContext);
 export const useExcalidrawAppState = () =>
   useContext(ExcalidrawAppStateContext);
 export const useExcalidrawSetAppState = () =>
@@ -412,8 +420,10 @@ class App extends React.Component<AppProps, AppState> {
       theme = defaultAppState.theme,
       name = defaultAppState.name,
     } = props;
+    this.scene = new Scene();
     this.state = {
       ...defaultAppState,
+      currentLayerId: this.scene.getLayers()[0].id,
       theme,
       isLoading: true,
       ...this.getCanvasOffsets(),
@@ -448,6 +458,7 @@ class App extends React.Component<AppProps, AppState> {
         },
         scrollToContent: this.scrollToContent,
         getSceneElements: this.getSceneElements,
+        getLayers: this.getLayers,
         getAppState: () => this.state,
         getFiles: () => this.files,
         refresh: this.refresh,
@@ -471,7 +482,6 @@ class App extends React.Component<AppProps, AppState> {
       id: this.id,
     };
 
-    this.scene = new Scene();
     this.fonts = new Fonts({
       scene: this.scene,
       onSceneUpdated: this.onSceneUpdated,
@@ -481,6 +491,7 @@ class App extends React.Component<AppProps, AppState> {
       this.syncActionResult,
       () => this.state,
       () => this.scene.getElementsIncludingDeleted(),
+      () => this.scene.getLayers(),
       this,
     );
     this.actionManager.registerAll(actions);
@@ -573,79 +584,84 @@ class App extends React.Component<AppProps, AppState> {
                 <ExcalidrawElementsContext.Provider
                   value={this.scene.getNonDeletedElements()}
                 >
-                  <ExcalidrawActionManagerContext.Provider
-                    value={this.actionManager}
+                  <ExcalidrawLayersContext.Provider
+                    value={this.scene.getLayers()}
                   >
-                    <LayerUI
-                      canvas={this.canvas}
-                      appState={this.state}
-                      files={this.files}
-                      setAppState={this.setAppState}
-                      actionManager={this.actionManager}
-                      elements={this.scene.getNonDeletedElements()}
-                      onLockToggle={this.toggleLock}
-                      onPenModeToggle={this.togglePenMode}
-                      onHandToolToggle={this.onHandToolToggle}
-                      onInsertElements={(elements) =>
-                        this.addElementsFromPasteOrLibrary({
-                          elements,
-                          position: "center",
-                          files: null,
-                        })
-                      }
-                      langCode={getLanguage().code}
-                      renderTopRightUI={renderTopRightUI}
-                      renderCustomStats={renderCustomStats}
-                      renderCustomSidebar={this.props.renderSidebar}
-                      showExitZenModeBtn={
-                        typeof this.props?.zenModeEnabled === "undefined" &&
-                        this.state.zenModeEnabled
-                      }
-                      libraryReturnUrl={this.props.libraryReturnUrl}
-                      UIOptions={this.props.UIOptions}
-                      focusContainer={this.focusContainer}
-                      library={this.library}
-                      id={this.id}
-                      onImageAction={this.onImageAction}
-                      renderWelcomeScreen={
-                        !this.state.isLoading &&
-                        this.state.showWelcomeScreen &&
-                        this.state.activeTool.type === "selection" &&
-                        !this.scene.getElementsIncludingDeleted().length
-                      }
+                    <ExcalidrawActionManagerContext.Provider
+                      value={this.actionManager}
                     >
-                      {this.props.children}
-                    </LayerUI>
-                    <div className="excalidraw-textEditorContainer" />
-                    <div className="excalidraw-contextMenuContainer" />
-                    {selectedElement.length === 1 &&
-                      !this.state.contextMenu &&
-                      this.state.showHyperlinkPopup && (
-                        <Hyperlink
-                          key={selectedElement[0].id}
-                          element={selectedElement[0]}
-                          setAppState={this.setAppState}
-                          onLinkOpen={this.props.onLinkOpen}
+                      <LayerUI
+                        canvas={this.canvas}
+                        appState={this.state}
+                        files={this.files}
+                        setAppState={this.setAppState}
+                        actionManager={this.actionManager}
+                        elements={this.scene.getNonDeletedElements()}
+                        layers={this.scene.getLayers()}
+                        onLockToggle={this.toggleLock}
+                        onPenModeToggle={this.togglePenMode}
+                        onHandToolToggle={this.onHandToolToggle}
+                        onInsertElements={(elements) =>
+                          this.addElementsFromPasteOrLibrary({
+                            elements,
+                            position: "center",
+                            files: null,
+                          })
+                        }
+                        langCode={getLanguage().code}
+                        renderTopRightUI={renderTopRightUI}
+                        renderCustomStats={renderCustomStats}
+                        renderCustomSidebar={this.props.renderSidebar}
+                        showExitZenModeBtn={
+                          typeof this.props?.zenModeEnabled === "undefined" &&
+                          this.state.zenModeEnabled
+                        }
+                        libraryReturnUrl={this.props.libraryReturnUrl}
+                        UIOptions={this.props.UIOptions}
+                        focusContainer={this.focusContainer}
+                        library={this.library}
+                        id={this.id}
+                        onImageAction={this.onImageAction}
+                        renderWelcomeScreen={
+                          !this.state.isLoading &&
+                          this.state.showWelcomeScreen &&
+                          this.state.activeTool.type === "selection" &&
+                          !this.scene.getElementsIncludingDeleted().length
+                        }
+                      >
+                        {this.props.children}
+                      </LayerUI>
+                      <div className="excalidraw-textEditorContainer" />
+                      <div className="excalidraw-contextMenuContainer" />
+                      {selectedElement.length === 1 &&
+                        !this.state.contextMenu &&
+                        this.state.showHyperlinkPopup && (
+                          <Hyperlink
+                            key={selectedElement[0].id}
+                            element={selectedElement[0]}
+                            setAppState={this.setAppState}
+                            onLinkOpen={this.props.onLinkOpen}
+                          />
+                        )}
+                      {this.state.toast !== null && (
+                        <Toast
+                          message={this.state.toast.message}
+                          onClose={() => this.setToast(null)}
+                          duration={this.state.toast.duration}
+                          closable={this.state.toast.closable}
                         />
                       )}
-                    {this.state.toast !== null && (
-                      <Toast
-                        message={this.state.toast.message}
-                        onClose={() => this.setToast(null)}
-                        duration={this.state.toast.duration}
-                        closable={this.state.toast.closable}
-                      />
-                    )}
-                    {this.state.contextMenu && (
-                      <ContextMenu
-                        items={this.state.contextMenu.items}
-                        top={this.state.contextMenu.top}
-                        left={this.state.contextMenu.left}
-                        actionManager={this.actionManager}
-                      />
-                    )}
-                    <main>{this.renderCanvas()}</main>
-                  </ExcalidrawActionManagerContext.Provider>
+                      {this.state.contextMenu && (
+                        <ContextMenu
+                          items={this.state.contextMenu.items}
+                          top={this.state.contextMenu.top}
+                          left={this.state.contextMenu.left}
+                          actionManager={this.actionManager}
+                        />
+                      )}
+                      <main>{this.renderCanvas()}</main>
+                    </ExcalidrawActionManagerContext.Provider>
+                  </ExcalidrawLayersContext.Provider>
                 </ExcalidrawElementsContext.Provider>{" "}
               </ExcalidrawAppStateContext.Provider>
             </ExcalidrawSetAppStateContext.Provider>
@@ -669,6 +685,10 @@ class App extends React.Component<AppProps, AppState> {
     return this.scene.getNonDeletedElements();
   };
 
+  public getLayers = () => {
+    return this.scene.getLayers();
+  };
+
   private syncActionResult = withBatchedUpdates(
     (actionResult: ActionResult) => {
       if (this.unmounted || actionResult === false) {
@@ -687,6 +707,13 @@ class App extends React.Component<AppProps, AppState> {
           }
         });
         this.scene.replaceAllElements(actionResult.elements);
+        if (actionResult.commitToHistory) {
+          this.history.resumeRecording();
+        }
+      }
+
+      if (actionResult.layers) {
+        this.scene.replaceAllLayers(actionResult.layers);
         if (actionResult.commitToHistory) {
           this.history.resumeRecording();
         }
@@ -784,10 +811,12 @@ class App extends React.Component<AppProps, AppState> {
   private resetScene = withBatchedUpdates(
     (opts?: { resetLoadingState: boolean }) => {
       this.scene.replaceAllElements([]);
+      this.scene.replaceAllLayers([Scene.getDefaultLayer()]);
       this.setState((state) => ({
         ...getDefaultAppState(),
         isLoading: opts?.resetLoadingState ? false : state.isLoading,
         theme: this.state.theme,
+        currentLayerId: this.scene.getLayers()[0].id,
       }));
       this.resetHistory();
     },
@@ -839,7 +868,9 @@ class App extends React.Component<AppProps, AppState> {
         },
       };
     }
-    const scene = restore(initialData, null, null, { repairBindings: true });
+    const scene = restore(initialData, null, null, null, {
+      repairBindings: true,
+    });
     scene.appState = {
       ...scene.appState,
       theme: this.props.theme || scene.appState.theme,
@@ -1710,6 +1741,7 @@ class App extends React.Component<AppProps, AppState> {
       textAlign: this.state.currentItemTextAlign,
       verticalAlign: DEFAULT_VERTICAL_ALIGN,
       locked: false,
+      layerId: this.state.currentLayerId,
     };
 
     const LINE_GAP = 10;
@@ -1903,6 +1935,7 @@ class App extends React.Component<AppProps, AppState> {
   public updateScene = withBatchedUpdates(
     <K extends keyof AppState>(sceneData: {
       elements?: SceneData["elements"];
+      layers?: SceneData["layers"];
       appState?: Pick<AppState, K> | null;
       collaborators?: SceneData["collaborators"];
       commitToHistory?: SceneData["commitToHistory"];
@@ -2652,6 +2685,7 @@ class App extends React.Component<AppProps, AppState> {
           containerId: shouldBindToContainer ? container?.id : undefined,
           groupIds: container?.groupIds ?? [],
           locked: false,
+          layerId: this.state.currentLayerId,
         });
 
     if (!existingTextElement && shouldBindToContainer && container) {
@@ -4159,6 +4193,7 @@ class App extends React.Component<AppProps, AppState> {
       roundness: null,
       simulatePressure: event.pressure === 0.5,
       locked: false,
+      layerId: this.state.currentLayerId,
     });
 
     this.setState((prevState) => ({
@@ -4215,6 +4250,7 @@ class App extends React.Component<AppProps, AppState> {
       roundness: null,
       opacity: this.state.currentItemOpacity,
       locked: false,
+      layerId: this.state.currentLayerId,
     });
 
     return element;
@@ -4306,6 +4342,7 @@ class App extends React.Component<AppProps, AppState> {
         startArrowhead,
         endArrowhead,
         locked: false,
+        layerId: this.state.currentLayerId,
       });
       this.setState((prevState) => ({
         selectedElementIds: {
@@ -4362,6 +4399,7 @@ class App extends React.Component<AppProps, AppState> {
             }
           : null,
       locked: false,
+      layerId: this.state.currentLayerId,
     });
 
     if (element.type === "selection") {
@@ -5905,6 +5943,7 @@ class App extends React.Component<AppProps, AppState> {
               file,
               this.state,
               this.scene.getElementsIncludingDeleted(),
+              this.scene.getLayers(),
               fileHandle,
             );
             this.syncActionResult({
@@ -5978,6 +6017,7 @@ class App extends React.Component<AppProps, AppState> {
         file,
         this.state,
         this.scene.getElementsIncludingDeleted(),
+        this.scene.getLayers(),
         fileHandle,
       );
       if (ret.type === MIME_TYPES.excalidraw) {

@@ -15,7 +15,7 @@ import { t } from "../i18n";
 export const actionCopy = register({
   name: "copy",
   trackEvent: { category: "element" },
-  perform: (elements, appState, _, app) => {
+  perform: (elements, _layers, appState, _, app) => {
     const selectedElements = getSelectedElements(elements, appState, true);
 
     copyToClipboard(selectedElements, appState, app.files);
@@ -24,7 +24,7 @@ export const actionCopy = register({
       commitToHistory: false,
     };
   },
-  predicate: (elements, appState, appProps, app) => {
+  predicate: (elements, _layers, appState, appProps, app) => {
     return app.device.isMobile && !!navigator.clipboard;
   },
   contextItemLabel: "labels.copy",
@@ -41,7 +41,7 @@ export const actionPaste = register({
       commitToHistory: false,
     };
   },
-  predicate: (elements, appState, appProps, app) => {
+  predicate: (elements, _layers, appState, appProps, app) => {
     return app.device.isMobile && !!navigator.clipboard;
   },
   contextItemLabel: "labels.paste",
@@ -52,11 +52,11 @@ export const actionPaste = register({
 export const actionCut = register({
   name: "cut",
   trackEvent: { category: "element" },
-  perform: (elements, appState, data, app) => {
-    actionCopy.perform(elements, appState, data, app);
-    return actionDeleteSelected.perform(elements, appState);
+  perform: (elements, _layers, appState, data, app) => {
+    actionCopy.perform(elements, _layers, appState, data, app);
+    return actionDeleteSelected.perform(elements, _layers, appState);
   },
-  predicate: (elements, appState, appProps, app) => {
+  predicate: (elements, _layers, appState, appProps, app) => {
     return app.device.isMobile && !!navigator.clipboard;
   },
   contextItemLabel: "labels.cut",
@@ -66,7 +66,7 @@ export const actionCut = register({
 export const actionCopyAsSvg = register({
   name: "copyAsSvg",
   trackEvent: { category: "element" },
-  perform: async (elements, appState, _data, app) => {
+  perform: async (elements, layers, appState, _data, app) => {
     if (!app.canvas) {
       return {
         commitToHistory: false,
@@ -83,6 +83,7 @@ export const actionCopyAsSvg = register({
         selectedElements.length
           ? selectedElements
           : getNonDeletedElements(elements),
+        layers,
         appState,
         app.files,
         appState,
@@ -110,7 +111,7 @@ export const actionCopyAsSvg = register({
 export const actionCopyAsPng = register({
   name: "copyAsPng",
   trackEvent: { category: "element" },
-  perform: async (elements, appState, _data, app) => {
+  perform: async (elements, layers, appState, _data, app) => {
     if (!app.canvas) {
       return {
         commitToHistory: false,
@@ -127,6 +128,7 @@ export const actionCopyAsPng = register({
         selectedElements.length
           ? selectedElements
           : getNonDeletedElements(elements),
+        layers,
         appState,
         app.files,
         appState,
@@ -168,7 +170,7 @@ export const actionCopyAsPng = register({
 export const copyText = register({
   name: "copyText",
   trackEvent: { category: "element" },
-  perform: (elements, appState) => {
+  perform: (elements, _layers, appState) => {
     const selectedElements = getSelectedElements(
       getNonDeletedElements(elements),
       appState,
@@ -188,7 +190,7 @@ export const copyText = register({
       commitToHistory: false,
     };
   },
-  predicate: (elements, appState) => {
+  predicate: (elements, _layers, appState) => {
     return (
       probablySupportsClipboardWriteText &&
       getSelectedElements(elements, appState, true).some(isTextElement)

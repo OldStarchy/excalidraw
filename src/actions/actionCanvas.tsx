@@ -19,17 +19,18 @@ import {
   isEraserActive,
   isHandToolActive,
 } from "../appState";
+import Scene from "../scene/Scene";
 
 export const actionChangeViewBackgroundColor = register({
   name: "changeViewBackgroundColor",
   trackEvent: false,
-  predicate: (elements, appState, props, app) => {
+  predicate: (_elements, _layers, appState, props, app) => {
     return (
       !!app.props.UIOptions.canvasActions.changeViewBackgroundColor &&
       !appState.viewModeEnabled
     );
   },
-  perform: (_, appState, value) => {
+  perform: (_elements, _layers, appState, value) => {
     return {
       appState: { ...appState, ...value },
       commitToHistory: !!value.viewBackgroundColor,
@@ -60,18 +61,20 @@ export const actionChangeViewBackgroundColor = register({
 export const actionClearCanvas = register({
   name: "clearCanvas",
   trackEvent: { category: "canvas" },
-  predicate: (elements, appState, props, app) => {
+  predicate: (_elements, _layers, appState, props, app) => {
     return (
       !!app.props.UIOptions.canvasActions.clearCanvas &&
       !appState.viewModeEnabled
     );
   },
-  perform: (elements, appState, _, app) => {
+  perform: (elements, layers, appState, _, app) => {
     app.imageCache.clear();
+    const defaultLayer = Scene.getDefaultLayer();
     return {
       elements: elements.map((element) =>
         newElementWith(element, { isDeleted: true }),
       ),
+      layers: [defaultLayer],
       appState: {
         ...getDefaultAppState(),
         files: {},
@@ -87,6 +90,7 @@ export const actionClearCanvas = register({
           appState.activeTool.type === "image"
             ? { ...appState.activeTool, type: "selection" }
             : appState.activeTool,
+        currentLayerId: defaultLayer.id,
       },
       commitToHistory: true,
     };
@@ -97,7 +101,7 @@ export const actionZoomIn = register({
   name: "zoomIn",
   viewMode: true,
   trackEvent: { category: "canvas" },
-  perform: (_elements, appState, _, app) => {
+  perform: (_elements, _layers, appState, _, app) => {
     return {
       appState: {
         ...appState,
@@ -134,7 +138,7 @@ export const actionZoomOut = register({
   name: "zoomOut",
   viewMode: true,
   trackEvent: { category: "canvas" },
-  perform: (_elements, appState, _, app) => {
+  perform: (_elements, _layers, appState, _, app) => {
     return {
       appState: {
         ...appState,
@@ -171,7 +175,7 @@ export const actionResetZoom = register({
   name: "resetZoom",
   viewMode: true,
   trackEvent: { category: "canvas" },
-  perform: (_elements, appState, _, app) => {
+  perform: (_elements, _layers, appState, _, app) => {
     return {
       appState: {
         ...appState,
@@ -269,7 +273,8 @@ const zoomToFitElements = (
 export const actionZoomToSelected = register({
   name: "zoomToSelection",
   trackEvent: { category: "canvas" },
-  perform: (elements, appState) => zoomToFitElements(elements, appState, true),
+  perform: (elements, _layers, appState) =>
+    zoomToFitElements(elements, appState, true),
   keyTest: (event) =>
     event.code === CODES.TWO &&
     event.shiftKey &&
@@ -281,7 +286,8 @@ export const actionZoomToFit = register({
   name: "zoomToFit",
   viewMode: true,
   trackEvent: { category: "canvas" },
-  perform: (elements, appState) => zoomToFitElements(elements, appState, false),
+  perform: (elements, _layers, appState) =>
+    zoomToFitElements(elements, appState, false),
   keyTest: (event) =>
     event.code === CODES.ONE &&
     event.shiftKey &&
@@ -293,7 +299,7 @@ export const actionToggleTheme = register({
   name: "toggleTheme",
   viewMode: true,
   trackEvent: { category: "canvas" },
-  perform: (_, appState, value) => {
+  perform: (_elements, _layers, appState, value) => {
     return {
       appState: {
         ...appState,
@@ -304,7 +310,7 @@ export const actionToggleTheme = register({
     };
   },
   keyTest: (event) => event.altKey && event.shiftKey && event.code === CODES.D,
-  predicate: (elements, appState, props, app) => {
+  predicate: (elements, layers, appState, props, app) => {
     return !!app.props.UIOptions.canvasActions.toggleTheme;
   },
 });
@@ -312,7 +318,7 @@ export const actionToggleTheme = register({
 export const actionToggleEraserTool = register({
   name: "toggleEraserTool",
   trackEvent: { category: "toolbar" },
-  perform: (elements, appState) => {
+  perform: (elements, layers, appState) => {
     let activeTool: AppState["activeTool"];
 
     if (isEraserActive(appState)) {
@@ -345,7 +351,7 @@ export const actionToggleEraserTool = register({
 export const actionToggleHandTool = register({
   name: "toggleHandTool",
   trackEvent: { category: "toolbar" },
-  perform: (elements, appState, _, app) => {
+  perform: (elements, layers, appState, _, app) => {
     let activeTool: AppState["activeTool"];
 
     if (isHandToolActive(appState)) {

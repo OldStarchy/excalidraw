@@ -1,5 +1,5 @@
 import rough from "roughjs/bin/rough";
-import { NonDeletedExcalidrawElement } from "../element/types";
+import { ExcalidrawLayer, NonDeletedExcalidrawElement } from "../element/types";
 import { getCommonBounds } from "../element/bounds";
 import { renderScene, renderSceneToSvg } from "../renderer/renderScene";
 import { distance } from "../utils";
@@ -16,6 +16,7 @@ export const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
 
 export const exportToCanvas = async (
   elements: readonly NonDeletedExcalidrawElement[],
+  layers: readonly ExcalidrawLayer[],
   appState: AppState,
   files: BinaryFiles,
   {
@@ -81,6 +82,7 @@ export const exportToCanvas = async (
 
 export const exportToSvg = async (
   elements: readonly NonDeletedExcalidrawElement[],
+  layers: readonly ExcalidrawLayer[],
   appState: {
     exportBackground: boolean;
     exportPadding?: number;
@@ -103,7 +105,7 @@ export const exportToSvg = async (
       metadata = await (
         await import(/* webpackChunkName: "image" */ "../../src/data/image")
       ).encodeSvgMetadata({
-        text: serializeAsJSON(elements, appState, files || {}, "local"),
+        text: serializeAsJSON(elements, layers, appState, files || {}, "local"),
       });
     } catch (error: any) {
       console.error(error);

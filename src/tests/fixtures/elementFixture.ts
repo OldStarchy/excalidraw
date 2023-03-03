@@ -1,4 +1,4 @@
-import { ExcalidrawElement } from "../../element/types";
+import { ExcalidrawElement, ExcalidrawLayer } from "../../element/types";
 
 const elementBase: Omit<ExcalidrawElement, "type"> = {
   id: "vWrqOAfkind2qcm7LDAGZ",
@@ -24,6 +24,7 @@ const elementBase: Omit<ExcalidrawElement, "type"> = {
   updated: 1,
   link: null,
   locked: false,
+  layerId: "abcyesthisislayercba",
 };
 
 export const rectangleFixture: ExcalidrawElement = {
@@ -42,4 +43,14 @@ export const rectangleWithLinkFixture: ExcalidrawElement = {
   ...elementBase,
   type: "rectangle",
   link: "excalidraw.com",
+};
+
+export const layerFixture: ExcalidrawLayer = {
+  id: "abcyesthisislayercba",
+  name: "Default",
+  visible: true,
+  locked: false,
+  version: 0,
+  versionNonce: 0,
+  updated: 0,
 };

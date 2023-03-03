@@ -192,6 +192,7 @@ const chartXLabels = (
   y: number,
   groupId: string,
   backgroundColor: string,
+  layerId: string,
 ): ChartElements => {
   return (
     spreadsheet.labels?.map((label, index) => {
@@ -207,6 +208,7 @@ const chartXLabels = (
         fontSize: 16,
         textAlign: "center",
         verticalAlign: "top",
+        layerId,
       });
     }) || []
   );
@@ -218,6 +220,7 @@ const chartYLabels = (
   y: number,
   groupId: string,
   backgroundColor: string,
+  layerId: string,
 ): ChartElements => {
   const minYLabel = newTextElement({
     groupIds: [groupId],
@@ -227,6 +230,7 @@ const chartYLabels = (
     y: y - BAR_GAP,
     text: "0",
     textAlign: "right",
+    layerId,
   });
 
   const maxYLabel = newTextElement({
@@ -237,6 +241,7 @@ const chartYLabels = (
     y: y - BAR_HEIGHT - minYLabel.height / 2,
     text: Math.max(...spreadsheet.values).toLocaleString(),
     textAlign: "right",
+    layerId,
   });
 
   return [minYLabel, maxYLabel];
@@ -248,6 +253,7 @@ const chartLines = (
   y: number,
   groupId: string,
   backgroundColor: string,
+  layerId: string,
 ): ChartElements => {
   const { chartWidth, chartHeight } = getChartDimentions(spreadsheet);
   const xLine = newLinearElement({
@@ -264,6 +270,7 @@ const chartLines = (
       [0, 0],
       [chartWidth, 0],
     ],
+    layerId,
   });
 
   const yLine = newLinearElement({
@@ -280,6 +287,7 @@ const chartLines = (
       [0, 0],
       [0, -chartHeight],
     ],
+    layerId,
   });
 
   const maxLine = newLinearElement({
@@ -298,6 +306,7 @@ const chartLines = (
       [0, 0],
       [chartWidth, 0],
     ],
+    layerId,
   });
 
   return [xLine, yLine, maxLine];
@@ -310,6 +319,7 @@ const chartBaseElements = (
   y: number,
   groupId: string,
   backgroundColor: string,
+  layerId: string,
   debug?: boolean,
 ): ChartElements => {
   const { chartWidth, chartHeight } = getChartDimentions(spreadsheet);
@@ -325,6 +335,7 @@ const chartBaseElements = (
         roundness: null,
         strokeStyle: "solid",
         textAlign: "center",
+        layerId,
       })
     : null;
 
@@ -341,15 +352,16 @@ const chartBaseElements = (
         strokeColor: colors.elementStroke[0],
         fillStyle: "solid",
         opacity: 6,
+        layerId,
       })
     : null;
 
   return [
     ...(debugRect ? [debugRect] : []),
     ...(title ? [title] : []),
-    ...chartXLabels(spreadsheet, x, y, groupId, backgroundColor),
-    ...chartYLabels(spreadsheet, x, y, groupId, backgroundColor),
-    ...chartLines(spreadsheet, x, y, groupId, backgroundColor),
+    ...chartXLabels(spreadsheet, x, y, groupId, backgroundColor, layerId),
+    ...chartYLabels(spreadsheet, x, y, groupId, backgroundColor, layerId),
+    ...chartLines(spreadsheet, x, y, groupId, backgroundColor, layerId),
   ];
 };
 
@@ -357,6 +369,7 @@ const chartTypeBar = (
   spreadsheet: Spreadsheet,
   x: number,
   y: number,
+  layerId: string,
 ): ChartElements => {
   const max = Math.max(...spreadsheet.values);
   const groupId = randomId();
@@ -373,6 +386,7 @@ const chartTypeBar = (
       y: y - barHeight - BAR_GAP,
       width: BAR_WIDTH,
       height: barHeight,
+      layerId,
     });
   });
 
@@ -384,6 +398,7 @@ const chartTypeBar = (
       y,
       groupId,
       backgroundColor,
+      layerId,
       process.env.NODE_ENV === ENV.DEVELOPMENT,
     ),
   ];
@@ -393,6 +408,7 @@ const chartTypeLine = (
   spreadsheet: Spreadsheet,
   x: number,
   y: number,
+  layerId: string,
 ): ChartElements => {
   const max = Math.max(...spreadsheet.values);
   const groupId = randomId();
@@ -425,6 +441,7 @@ const chartTypeLine = (
     width: maxX - minX,
     strokeWidth: 2,
     points: points as any,
+    layerId,
   });
 
   const dots = spreadsheet.values.map((value, index) => {
@@ -441,6 +458,7 @@ const chartTypeLine = (
       y: y + cy - BAR_GAP * 2,
       width: BAR_GAP,
       height: BAR_GAP,
+      layerId,
     });
   });
 
@@ -463,6 +481,7 @@ const chartTypeLine = (
         [0, 0],
         [0, cy],
       ],
+      layerId,
     });
   });
 
@@ -473,6 +492,7 @@ const chartTypeLine = (
       y,
       groupId,
       backgroundColor,
+      layerId,
       process.env.NODE_ENV === ENV.DEVELOPMENT,
     ),
     line,
@@ -486,9 +506,10 @@ export const renderSpreadsheet = (
   spreadsheet: Spreadsheet,
   x: number,
   y: number,
+  layerId: string,
 ): ChartElements => {
   if (chartType === "line") {
-    return chartTypeLine(spreadsheet, x, y);
+    return chartTypeLine(spreadsheet, x, y, layerId);
   }
-  return chartTypeBar(spreadsheet, x, y);
+  return chartTypeBar(spreadsheet, x, y, layerId);
 };

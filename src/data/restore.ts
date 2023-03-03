@@ -1,5 +1,6 @@
 import {
   ExcalidrawElement,
+  ExcalidrawLayer,
   ExcalidrawSelectionElement,
   ExcalidrawTextElement,
   FontFamilyValues,
@@ -34,6 +35,7 @@ import { bumpVersion } from "../element/mutateElement";
 import { getUpdatedTimestamp, updateActiveTool } from "../utils";
 import { arrayToMap } from "../utils";
 import oc from "open-color";
+import Scene from "../scene/Scene";
 
 type RestoredAppState = Omit<
   AppState,
@@ -60,6 +62,7 @@ export const AllowedExcalidrawActiveTools: Record<
 
 export type RestoredDataState = {
   elements: ExcalidrawElement[];
+  layers: ExcalidrawLayer[];
   appState: RestoredAppState;
   files: BinaryFiles;
 };
@@ -135,6 +138,7 @@ const restoreElementWithProperties = <
     updated: element.updated ?? getUpdatedTimestamp(),
     link: element.link ?? null,
     locked: element.locked ?? false,
+    layerId: element.layerId ?? null,
   };
 
   if ("customData" in element) {
@@ -338,7 +342,13 @@ export const restoreElements = (
   elements: ImportedDataState["elements"],
   /** NOTE doesn't serve for reconciliation */
   localElements: readonly ExcalidrawElement[] | null | undefined,
-  opts?: { refreshDimensions?: boolean; repairBindings?: boolean } | undefined,
+  opts?:
+    | {
+        refreshDimensions?: boolean;
+        repairBindings?: boolean;
+        layers?: ExcalidrawLayer[];
+      }
+    | undefined,
 ): ExcalidrawElement[] => {
   const localElementsMap = localElements ? arrayToMap(localElements) : null;
   const restoredElements = (elements || []).reduce((elements, element) => {
@@ -355,6 +365,18 @@ export const restoreElements = (
           migratedElement = bumpVersion(migratedElement, localElement.version);
         }
         elements.push(migratedElement);
+
+        if (opts?.layers && !migratedElement.layerId) {
+          let defaultLayer = opts.layers.find(
+            (layer) => layer.name === "Default",
+          );
+          if (!defaultLayer) {
+            defaultLayer = Scene.getDefaultLayer();
+            opts.layers.push(defaultLayer);
+          }
+          (migratedElement as Mutable<typeof migratedElement>).layerId =
+            defaultLayer.id;
+        }
       }
     }
     return elements;
@@ -375,6 +397,31 @@ export const restoreElements = (
   }
 
   return restoredElements;
+};
+
+export const restoreLayers = (
+  layers: ImportedDataState["layers"],
+  localLayers: readonly ExcalidrawLayer[] | null | undefined,
+): ExcalidrawLayer[] => {
+  const localLayersMap = localLayers ? arrayToMap(localLayers) : null;
+
+  const restoredLayers = (layers || []).reduce((layers, layer) => {
+    let migratedLayer: ExcalidrawLayer = layer;
+
+    const localLayer = localLayersMap?.get(layer.id);
+    if (localLayer && localLayer.version > migratedLayer.version) {
+      migratedLayer = bumpVersion(migratedLayer, localLayer.version);
+    }
+    layers.push(migratedLayer);
+
+    return layers;
+  }, [] as ExcalidrawLayer[]);
+
+  if (restoredLayers.length === 0) {
+    restoredLayers.push(Scene.getDefaultLayer());
+  }
+
+  return restoredLayers;
 };
 
 const coalesceAppStateValue = <
@@ -491,7 +538,10 @@ export const restoreAppState = (
 };
 
 export const restore = (
-  data: Pick<ImportedDataState, "appState" | "elements" | "files"> | null,
+  data: Pick<
+    ImportedDataState,
+    "appState" | "elements" | "layers" | "files"
+  > | null,
   /**
    * Local AppState (`this.state` or initial state from localStorage) so that we
    * don't overwrite local state with default values (when values not
@@ -500,10 +550,16 @@ export const restore = (
    */
   localAppState: Partial<AppState> | null | undefined,
   localElements: readonly ExcalidrawElement[] | null | undefined,
+  localLayers: readonly ExcalidrawLayer[] | null | undefined,
   elementsConfig?: { refreshDimensions?: boolean; repairBindings?: boolean },
 ): RestoredDataState => {
+  const layers = restoreLayers(data?.layers, localLayers);
   return {
-    elements: restoreElements(data?.elements, localElements, elementsConfig),
+    elements: restoreElements(data?.elements, localElements, {
+      ...elementsConfig,
+      layers,
+    }),
+    layers,
     appState: restoreAppState(data?.appState, localAppState || null),
     files: data?.files || {},
   };

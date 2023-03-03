@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { probablySupportsClipboardBlob } from "../clipboard";
 import { canvasToBlob } from "../data/blob";
-import { NonDeletedExcalidrawElement } from "../element/types";
+import { ExcalidrawLayer, NonDeletedExcalidrawElement } from "../element/types";
 import { t } from "../i18n";
 import { getSelectedElements, isSomeElementSelected } from "../scene";
 import { exportToCanvas } from "../scene/export";
@@ -33,6 +33,7 @@ export const ErrorCanvasPreview = () => {
 
 export type ExportCB = (
   elements: readonly NonDeletedExcalidrawElement[],
+  layers: readonly ExcalidrawLayer[],
   scale?: number,
 ) => void;
 
@@ -62,6 +63,7 @@ const ExportButton: React.FC<{
 
 const ImageExportModal = ({
   elements,
+  layers,
   appState,
   files,
   exportPadding = DEFAULT_EXPORT_PADDING,
@@ -72,6 +74,7 @@ const ImageExportModal = ({
 }: {
   appState: AppState;
   elements: readonly NonDeletedExcalidrawElement[];
+  layers: readonly ExcalidrawLayer[];
   files: BinaryFiles;
   exportPadding?: number;
   actionManager: ActionManager;
@@ -89,6 +92,7 @@ const ImageExportModal = ({
   const exportedElements = exportSelected
     ? getSelectedElements(elements, appState, true)
     : elements;
+  const exportedLayers = layers;
 
   useEffect(() => {
     setExportSelected(someElementIsSelected);
@@ -99,7 +103,7 @@ const ImageExportModal = ({
     if (!previewNode) {
       return;
     }
-    exportToCanvas(exportedElements, appState, files, {
+    exportToCanvas(exportedElements, exportedLayers, appState, files, {
       exportBackground,
       viewBackgroundColor,
       exportPadding,
@@ -120,6 +124,7 @@ const ImageExportModal = ({
     appState,
     files,
     exportedElements,
+    exportedLayers,
     exportBackground,
     exportPadding,
     viewBackgroundColor,
@@ -178,7 +183,7 @@ const ImageExportModal = ({
           color="indigo"
           title={t("buttons.exportToPng")}
           aria-label={t("buttons.exportToPng")}
-          onClick={() => onExportToPng(exportedElements)}
+          onClick={() => onExportToPng(exportedElements, exportedLayers)}
         >
           PNG
         </ExportButton>
@@ -186,7 +191,7 @@ const ImageExportModal = ({
           color="red"
           title={t("buttons.exportToSvg")}
           aria-label={t("buttons.exportToSvg")}
-          onClick={() => onExportToSvg(exportedElements)}
+          onClick={() => onExportToSvg(exportedElements, exportedLayers)}
         >
           SVG
         </ExportButton>
@@ -195,7 +200,9 @@ const ImageExportModal = ({
         {(probablySupportsClipboardBlob || isFirefox) && (
           <ExportButton
             title={t("buttons.copyPngToClipboard")}
-            onClick={() => onExportToClipboard(exportedElements)}
+            onClick={() =>
+              onExportToClipboard(exportedElements, exportedLayers)
+            }
             color="gray"
             shade={7}
           >
@@ -209,6 +216,7 @@ const ImageExportModal = ({
 
 export const ImageExportDialog = ({
   elements,
+  layers,
   appState,
   setAppState,
   files,
@@ -221,6 +229,7 @@ export const ImageExportDialog = ({
   appState: AppState;
   setAppState: React.Component<any, AppState>["setState"];
   elements: readonly NonDeletedExcalidrawElement[];
+  layers: readonly ExcalidrawLayer[];
   files: BinaryFiles;
   exportPadding?: number;
   actionManager: ActionManager;
@@ -238,6 +247,7 @@ export const ImageExportDialog = ({
         <Dialog onCloseRequest={handleClose} title={t("buttons.exportImage")}>
           <ImageExportModal
             elements={elements}
+            layers={layers}
             appState={appState}
             files={files}
             exportPadding={exportPadding}

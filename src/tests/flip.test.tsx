@@ -140,6 +140,7 @@ const createLinearElementWithCurveInsideMinMaxPoints = (
     ],
     startArrowhead: null,
     endArrowhead: null,
+    ...extraProps,
   });
 };
 

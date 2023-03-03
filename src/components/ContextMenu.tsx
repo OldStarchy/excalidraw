@@ -12,6 +12,7 @@ import { ActionManager } from "../actions/manager";
 import {
   useExcalidrawAppState,
   useExcalidrawElements,
+  useExcalidrawLayers,
   useExcalidrawSetAppState,
 } from "./App";
 import React from "react";
@@ -34,6 +35,7 @@ export const ContextMenu = React.memo(
     const appState = useExcalidrawAppState();
     const setAppState = useExcalidrawSetAppState();
     const elements = useExcalidrawElements();
+    const layers = useExcalidrawLayers();
 
     const filteredItems = items.reduce((acc: ContextMenuItem[], item) => {
       if (
@@ -42,6 +44,7 @@ export const ContextMenu = React.memo(
           !item.predicate ||
           item.predicate(
             elements,
+            layers,
             appState,
             actionManager.app.props,
             actionManager.app,

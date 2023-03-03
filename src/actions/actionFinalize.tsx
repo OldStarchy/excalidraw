@@ -19,7 +19,13 @@ import { AppState } from "../types";
 export const actionFinalize = register({
   name: "finalize",
   trackEvent: false,
-  perform: (elements, appState, _, { canvas, focusContainer, scene }) => {
+  perform: (
+    elements,
+    _layers,
+    appState,
+    _,
+    { canvas, focusContainer, scene },
+  ) => {
     if (appState.editingLinearElement) {
       const { elementId, startBindingElement, endBindingElement } =
         appState.editingLinearElement;

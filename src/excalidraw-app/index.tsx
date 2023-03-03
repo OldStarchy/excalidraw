@@ -15,6 +15,7 @@ import {
 import { loadFromBlob } from "../data/blob";
 import {
   ExcalidrawElement,
+  ExcalidrawLayer,
   FileId,
   NonDeletedExcalidrawElement,
   Theme,
@@ -162,7 +163,7 @@ const initializeScene = async (opts: {
     const url = externalUrlMatch[1];
     try {
       const request = await fetch(window.decodeURIComponent(url));
-      const data = await loadFromBlob(await request.blob(), null, null);
+      const data = await loadFromBlob(await request.blob(), null, null, null);
       if (
         !scene.elements.length ||
         window.confirm(t("alerts.loadSceneOverridePrompt"))
@@ -363,7 +364,9 @@ const ExcalidrawWrapper = () => {
           if (data.scene) {
             excalidrawAPI.updateScene({
               ...data.scene,
-              ...restore(data.scene, null, null, { repairBindings: true }),
+              ...restore(data.scene, null, null, null, {
+                repairBindings: true,
+              }),
               commitToHistory: true,
             });
           }
@@ -549,6 +552,7 @@ const ExcalidrawWrapper = () => {
 
   const onExportToBackend = async (
     exportedElements: readonly NonDeletedExcalidrawElement[],
+    exportedLayers: readonly ExcalidrawLayer[],
     appState: AppState,
     files: BinaryFiles,
     canvas: HTMLCanvasElement | null,
@@ -560,6 +564,7 @@ const ExcalidrawWrapper = () => {
       try {
         await exportToBackend(
           exportedElements,
+          exportedLayers,
           {
             ...appState,
             viewBackgroundColor: appState.exportBackground
@@ -620,7 +625,7 @@ const ExcalidrawWrapper = () => {
             toggleTheme: true,
             export: {
               onExportToBackend,
-              renderCustomUI: (elements, appState, files) => {
+              renderCustomUI: (elements, layers, appState, files) => {
                 return (
                   <ExportToExcalidrawPlus
                     elements={elements}

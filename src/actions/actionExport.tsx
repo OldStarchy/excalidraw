@@ -23,7 +23,7 @@ import "../components/ToolIcon.scss";
 export const actionChangeProjectName = register({
   name: "changeProjectName",
   trackEvent: false,
-  perform: (_elements, appState, value) => {
+  perform: (_elements, _layers, appState, value) => {
     return { appState: { ...appState, name: value }, commitToHistory: false };
   },
   PanelComponent: ({ appState, updateData, appProps }) => (
@@ -41,7 +41,7 @@ export const actionChangeProjectName = register({
 export const actionChangeExportScale = register({
   name: "changeExportScale",
   trackEvent: { category: "export", action: "scale" },
-  perform: (_elements, appState, value) => {
+  perform: (_elements, _layers, appState, value) => {
     return {
       appState: { ...appState, exportScale: value },
       commitToHistory: false,
@@ -90,7 +90,7 @@ export const actionChangeExportScale = register({
 export const actionChangeExportBackground = register({
   name: "changeExportBackground",
   trackEvent: { category: "export", action: "toggleBackground" },
-  perform: (_elements, appState, value) => {
+  perform: (_elements, _layers, appState, value) => {
     return {
       appState: { ...appState, exportBackground: value },
       commitToHistory: false,
@@ -109,7 +109,7 @@ export const actionChangeExportBackground = register({
 export const actionChangeExportEmbedScene = register({
   name: "changeExportEmbedScene",
   trackEvent: { category: "export", action: "embedScene" },
-  perform: (_elements, appState, value) => {
+  perform: (_elements, _layers, appState, value) => {
     return {
       appState: { ...appState, exportEmbedScene: value },
       commitToHistory: false,
@@ -131,20 +131,20 @@ export const actionChangeExportEmbedScene = register({
 export const actionSaveToActiveFile = register({
   name: "saveToActiveFile",
   trackEvent: { category: "export" },
-  predicate: (elements, appState, props, app) => {
+  predicate: (elements, layers, appState, props, app) => {
     return (
       !!app.props.UIOptions.canvasActions.saveToActiveFile &&
       !!appState.fileHandle &&
       !appState.viewModeEnabled
     );
   },
-  perform: async (elements, appState, value, app) => {
+  perform: async (elements, layers, appState, value, app) => {
     const fileHandleExists = !!appState.fileHandle;
 
     try {
       const { fileHandle } = isImageFileHandle(appState.fileHandle)
-        ? await resaveAsImageWithScene(elements, appState, app.files)
-        : await saveAsJSON(elements, appState, app.files);
+        ? await resaveAsImageWithScene(elements, layers, appState, app.files)
+        : await saveAsJSON(elements, layers, appState, app.files);
 
       return {
         commitToHistory: false,
@@ -180,10 +180,11 @@ export const actionSaveFileToDisk = register({
   name: "saveFileToDisk",
   viewMode: true,
   trackEvent: { category: "export" },
-  perform: async (elements, appState, value, app) => {
+  perform: async (elements, layers, appState, value, app) => {
     try {
       const { fileHandle } = await saveAsJSON(
         elements,
+        layers,
         {
           ...appState,
           fileHandle: null,
@@ -219,18 +220,18 @@ export const actionSaveFileToDisk = register({
 export const actionLoadScene = register({
   name: "loadScene",
   trackEvent: { category: "export" },
-  predicate: (elements, appState, props, app) => {
+  predicate: (elements, _layers, appState, props, app) => {
     return (
       !!app.props.UIOptions.canvasActions.loadScene && !appState.viewModeEnabled
     );
   },
-  perform: async (elements, appState, _, app) => {
+  perform: async (elements, layers, appState, _, app) => {
     try {
       const {
         elements: loadedElements,
         appState: loadedAppState,
         files,
-      } = await loadFromJSON(appState, elements);
+      } = await loadFromJSON(appState, elements, layers);
       return {
         elements: loadedElements,
         appState: loadedAppState,
@@ -256,7 +257,7 @@ export const actionLoadScene = register({
 export const actionExportWithDarkMode = register({
   name: "exportWithDarkMode",
   trackEvent: { category: "export", action: "toggleTheme" },
-  perform: (_elements, appState, value) => {
+  perform: (_elements, _layers, appState, value) => {
     return {
       appState: { ...appState, exportWithDarkMode: value },
       commitToHistory: false,

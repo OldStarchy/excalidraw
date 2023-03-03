@@ -4,7 +4,7 @@ import { ActionManager } from "../actions/manager";
 import { CLASSES, LIBRARY_SIDEBAR_WIDTH } from "../constants";
 import { exportCanvas } from "../data";
 import { isTextElement, showSelectedShapeActions } from "../element";
-import { NonDeletedExcalidrawElement } from "../element/types";
+import { ExcalidrawLayer, NonDeletedExcalidrawElement } from "../element/types";
 import { Language, t } from "../i18n";
 import { calculateScrollCenter } from "../scene";
 import { ExportType } from "../scene/types";
@@ -54,6 +54,7 @@ interface LayerUIProps {
   canvas: HTMLCanvasElement | null;
   setAppState: React.Component<any, AppState>["setState"];
   elements: readonly NonDeletedExcalidrawElement[];
+  layers: readonly ExcalidrawLayer[];
   onLockToggle: () => void;
   onHandToolToggle: () => void;
   onPenModeToggle: () => void;
@@ -105,6 +106,7 @@ const LayerUI = ({
   files,
   setAppState,
   elements,
+  layers,
   canvas,
   onLockToggle,
   onHandToolToggle,
@@ -134,6 +136,7 @@ const LayerUI = ({
     return (
       <JSONExportDialog
         elements={elements}
+        layers={layers}
         appState={appState}
         files={files}
         actionManager={actionManager}
@@ -151,11 +154,12 @@ const LayerUI = ({
 
     const createExporter =
       (type: ExportType): ExportCB =>
-      async (exportedElements) => {
+      async (exportedElements, exportedLayers) => {
         trackEvent("export", type, "ui");
         const fileHandle = await exportCanvas(
           type,
           exportedElements,
+          exportedLayers,
           appState,
           files,
           {
@@ -182,6 +186,7 @@ const LayerUI = ({
     return (
       <ImageExportDialog
         elements={elements}
+        layers={layers}
         appState={appState}
         setAppState={setAppState}
         files={files}

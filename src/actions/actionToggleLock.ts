@@ -8,7 +8,7 @@ import { register } from "./register";
 export const actionToggleLock = register({
   name: "toggleLock",
   trackEvent: { category: "element" },
-  perform: (elements, appState) => {
+  perform: (elements, _layers, appState) => {
     const selectedElements = getSelectedElements(elements, appState, true);
 
     if (!selectedElements.length) {

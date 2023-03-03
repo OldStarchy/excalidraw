@@ -1,4 +1,4 @@
-import { ExcalidrawElement } from "../element/types";
+import { ExcalidrawElement, ExcalidrawLayer } from "../element/types";
 import {
   AppState,
   BinaryFiles,
@@ -13,6 +13,7 @@ export interface ExportedDataState {
   version: number;
   source: string;
   elements: readonly ExcalidrawElement[];
+  layers: readonly ExcalidrawLayer[];
   appState: ReturnType<typeof cleanAppStateForExport>;
   files: BinaryFiles | undefined;
 }
@@ -36,6 +37,7 @@ export interface ImportedDataState {
   version?: number;
   source?: string;
   elements?: readonly ExcalidrawElement[] | null;
+  layers?: readonly ExcalidrawLayer[] | null;
   appState?: Readonly<
     Partial<
       AppState & {

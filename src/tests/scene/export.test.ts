@@ -3,6 +3,7 @@ import * as exportUtils from "../../scene/export";
 import {
   diamondFixture,
   ellipseFixture,
+  layerFixture,
   rectangleWithLinkFixture,
 } from "../fixtures/elementFixture";
 
@@ -14,6 +15,7 @@ describe("exportToSvg", () => {
     { ...diamondFixture, height: ELEMENT_HEIGHT, width: ELEMENT_WIDTH },
     { ...ellipseFixture, height: ELEMENT_HEIGHT, width: ELEMENT_WIDTH },
   ] as NonDeletedExcalidrawElement[];
+  const LAYERS = [layerFixture];
 
   const DEFAULT_OPTIONS = {
     exportBackground: false,
@@ -24,6 +26,7 @@ describe("exportToSvg", () => {
   it("with default arguments", async () => {
     const svgElement = await exportUtils.exportToSvg(
       ELEMENTS,
+      LAYERS,
       DEFAULT_OPTIONS,
       null,
     );
@@ -36,6 +39,7 @@ describe("exportToSvg", () => {
 
     const svgElement = await exportUtils.exportToSvg(
       ELEMENTS,
+      LAYERS,
       {
         ...DEFAULT_OPTIONS,
         exportBackground: true,
@@ -53,6 +57,7 @@ describe("exportToSvg", () => {
   it("with dark mode", async () => {
     const svgElement = await exportUtils.exportToSvg(
       ELEMENTS,
+      LAYERS,
       {
         ...DEFAULT_OPTIONS,
         exportWithDarkMode: true,
@@ -68,6 +73,7 @@ describe("exportToSvg", () => {
   it("with exportPadding", async () => {
     const svgElement = await exportUtils.exportToSvg(
       ELEMENTS,
+      LAYERS,
       {
         ...DEFAULT_OPTIONS,
         exportPadding: 0,
@@ -88,6 +94,7 @@ describe("exportToSvg", () => {
 
     const svgElement = await exportUtils.exportToSvg(
       ELEMENTS,
+      LAYERS,
       {
         ...DEFAULT_OPTIONS,
         exportPadding: 0,
@@ -109,6 +116,7 @@ describe("exportToSvg", () => {
   it("with exportEmbedScene", async () => {
     const svgElement = await exportUtils.exportToSvg(
       ELEMENTS,
+      LAYERS,
       {
         ...DEFAULT_OPTIONS,
         exportEmbedScene: true,
@@ -121,6 +129,7 @@ describe("exportToSvg", () => {
   it("with elements that have a link", async () => {
     const svgElement = await exportUtils.exportToSvg(
       [rectangleWithLinkFixture],
+      LAYERS,
       DEFAULT_OPTIONS,
       null,
     );

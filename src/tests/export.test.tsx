@@ -49,7 +49,7 @@ describe("export", () => {
     const pngBlob = await API.loadFile("./fixtures/smiley.png");
     const pngBlobEmbedded = await encodePngMetadata({
       blob: pngBlob,
-      metadata: serializeAsJSON(testElements, h.state, {}, "local"),
+      metadata: serializeAsJSON(testElements, [], h.state, {}, "local"),
     });
     API.drop(pngBlobEmbedded);
 
@@ -62,7 +62,7 @@ describe("export", () => {
 
   it("test encoding/decoding scene for SVG export", async () => {
     const encoded = await encodeSvgMetadata({
-      text: serializeAsJSON(testElements, h.state, {}, "local"),
+      text: serializeAsJSON(testElements, [], h.state, {}, "local"),
     });
     const decoded = JSON.parse(await decodeSvgMetadata({ svg: encoded }));
     expect(decoded.elements).toEqual([
@@ -162,7 +162,7 @@ describe("export", () => {
       },
     } as const;
 
-    const svg = await exportToSvg(elements, appState, files);
+    const svg = await exportToSvg(elements, [], appState, files);
 
     const svgText = svg.outerHTML;
 

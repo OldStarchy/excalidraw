@@ -459,7 +459,7 @@ describe("restore", () => {
   it("when imported data state is null it should return an empty array of elements", () => {
     const stubLocalAppState = getDefaultAppState();
 
-    const restoredData = restore.restore(null, stubLocalAppState, null);
+    const restoredData = restore.restore(null, stubLocalAppState, null, null);
     expect(restoredData.elements.length).toBe(0);
   });
 
@@ -468,7 +468,7 @@ describe("restore", () => {
     stubLocalAppState.cursorButton = "down";
     stubLocalAppState.name = "local app state";
 
-    const restoredData = restore.restore(null, stubLocalAppState, null);
+    const restoredData = restore.restore(null, stubLocalAppState, null, null);
     expect(restoredData.appState.cursorButton).toBe(
       stubLocalAppState.cursorButton,
     );
@@ -489,6 +489,7 @@ describe("restore", () => {
       importedDataState,
       stubLocalAppState,
       null,
+      null,
     );
     expect(restoredData.elements.length).toBe(elements.length);
   });
@@ -501,7 +502,7 @@ describe("restore", () => {
     const importedDataState = {} as ImportedDataState;
     importedDataState.appState = stubImportedAppState;
 
-    const restoredData = restore.restore(importedDataState, null, null);
+    const restoredData = restore.restore(importedDataState, null, null, null);
     expect(restoredData.appState.cursorButton).toBe("up");
     expect(restoredData.appState.name).toBe(stubImportedAppState.name);
   });
@@ -516,6 +517,7 @@ describe("restore", () => {
       { elements: [rectangle, ellipse] },
       null,
       [rectangle_modified],
+      null,
     );
 
     expect(restoredData.elements[0].id).toBe(rectangle.id);

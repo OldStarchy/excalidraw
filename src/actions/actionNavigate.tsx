@@ -8,7 +8,7 @@ export const actionGoToCollaborator = register({
   name: "goToCollaborator",
   viewMode: true,
   trackEvent: { category: "collab" },
-  perform: (_elements, appState, value) => {
+  perform: (_elements, _layers, appState, value) => {
     const point = value as Collaborator["pointer"];
     if (!point) {
       return { appState, commitToHistory: false };

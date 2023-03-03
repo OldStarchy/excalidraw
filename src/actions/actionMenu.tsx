@@ -9,7 +9,7 @@ import { KEYS } from "../keys";
 export const actionToggleCanvasMenu = register({
   name: "toggleCanvasMenu",
   trackEvent: { category: "menu" },
-  perform: (_, appState) => ({
+  perform: (_elements, _layers, appState) => ({
     appState: {
       ...appState,
       openMenu: appState.openMenu === "canvas" ? null : "canvas",
@@ -30,7 +30,7 @@ export const actionToggleCanvasMenu = register({
 export const actionToggleEditMenu = register({
   name: "toggleEditMenu",
   trackEvent: { category: "menu" },
-  perform: (_elements, appState) => ({
+  perform: (_elements, _layers, appState) => ({
     appState: {
       ...appState,
       openMenu: appState.openMenu === "shape" ? null : "shape",
@@ -74,7 +74,7 @@ export const actionShortcuts = register({
   name: "toggleShortcuts",
   viewMode: true,
   trackEvent: { category: "menu", action: "toggleHelpDialog" },
-  perform: (_elements, appState, _, { focusContainer }) => {
+  perform: (_elements, _layers, appState, _, { focusContainer }) => {
     if (appState.openDialog === "help") {
       focusContainer();
     }

@@ -2,7 +2,7 @@ import { nanoid } from "nanoid";
 import { cleanAppStateForExport } from "../appState";
 import { ALLOWED_IMAGE_MIME_TYPES, MIME_TYPES } from "../constants";
 import { clearElementsForExport } from "../element";
-import { ExcalidrawElement, FileId } from "../element/types";
+import { ExcalidrawElement, ExcalidrawLayer, FileId } from "../element/types";
 import { CanvasError } from "../errors";
 import { t } from "../i18n";
 import { calculateScrollCenter } from "../scene";
@@ -128,6 +128,7 @@ export const loadSceneOrLibraryFromBlob = async (
   /** @see restore.localAppState */
   localAppState: AppState | null,
   localElements: readonly ExcalidrawElement[] | null,
+  localLayers: readonly ExcalidrawLayer[] | null,
   /** FileSystemHandle. Defaults to `blob.handle` if defined, otherwise null. */
   fileHandle?: FileSystemHandle | null,
 ) => {
@@ -156,6 +157,7 @@ export const loadSceneOrLibraryFromBlob = async (
           },
           localAppState,
           localElements,
+          localLayers,
           { repairBindings: true },
         ),
       };
@@ -177,6 +179,7 @@ export const loadFromBlob = async (
   /** @see restore.localAppState */
   localAppState: AppState | null,
   localElements: readonly ExcalidrawElement[] | null,
+  localLayers: readonly ExcalidrawLayer[] | null,
   /** FileSystemHandle. Defaults to `blob.handle` if defined, otherwise null. */
   fileHandle?: FileSystemHandle | null,
 ) => {
@@ -184,6 +187,7 @@ export const loadFromBlob = async (
     blob,
     localAppState,
     localElements,
+    localLayers,
     fileHandle,
   );
   if (ret.type !== MIME_TYPES.excalidraw) {

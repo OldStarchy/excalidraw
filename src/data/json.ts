@@ -7,7 +7,7 @@ import {
   VERSIONS,
 } from "../constants";
 import { clearElementsForDatabase, clearElementsForExport } from "../element";
-import { ExcalidrawElement } from "../element/types";
+import { ExcalidrawElement, ExcalidrawLayer } from "../element/types";
 import { AppState, BinaryFiles, LibraryItems } from "../types";
 import { isImageFileHandle, loadFromBlob, normalizeFile } from "./blob";
 
@@ -41,6 +41,7 @@ const filterOutDeletedFiles = (
 
 export const serializeAsJSON = (
   elements: readonly ExcalidrawElement[],
+  layers: readonly ExcalidrawLayer[],
   appState: Partial<AppState>,
   files: BinaryFiles,
   type: "local" | "database",
@@ -53,6 +54,7 @@ export const serializeAsJSON = (
       type === "local"
         ? clearElementsForExport(elements)
         : clearElementsForDatabase(elements),
+    layers,
     appState:
       type === "local"
         ? cleanAppStateForExport(appState)
@@ -69,10 +71,17 @@ export const serializeAsJSON = (
 
 export const saveAsJSON = async (
   elements: readonly ExcalidrawElement[],
+  layers: readonly ExcalidrawLayer[],
   appState: AppState,
   files: BinaryFiles,
 ) => {
-  const serialized = serializeAsJSON(elements, appState, files, "local");
+  const serialized = serializeAsJSON(
+    elements,
+    layers,
+    appState,
+    files,
+    "local",
+  );
   const blob = new Blob([serialized], {
     type: MIME_TYPES.excalidraw,
   });
@@ -91,6 +100,7 @@ export const saveAsJSON = async (
 export const loadFromJSON = async (
   localAppState: AppState,
   localElements: readonly ExcalidrawElement[] | null,
+  localLayers: readonly ExcalidrawLayer[] | null,
 ) => {
   const file = await fileOpen({
     description: "Excalidraw files",
@@ -102,6 +112,7 @@ export const loadFromJSON = async (
     await normalizeFile(file),
     localAppState,
     localElements,
+    localLayers,
     file.handle,
   );
 };

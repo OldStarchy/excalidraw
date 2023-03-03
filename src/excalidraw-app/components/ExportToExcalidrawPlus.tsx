@@ -28,7 +28,14 @@ const exportToExcalidrawPlus = async (
   const encryptionKey = (await generateEncryptionKey())!;
   const encryptedData = await encryptData(
     encryptionKey,
-    serializeAsJSON(elements, appState, files, "database"),
+    serializeAsJSON(
+      elements,
+      //ExcalidrawPlus doesn't support layers
+      [],
+      appState,
+      files,
+      "database",
+    ),
   );
 
   const blob = new Blob(

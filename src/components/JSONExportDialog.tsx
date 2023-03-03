@@ -1,5 +1,5 @@
 import React from "react";
-import { NonDeletedExcalidrawElement } from "../element/types";
+import { ExcalidrawLayer, NonDeletedExcalidrawElement } from "../element/types";
 import { t } from "../i18n";
 
 import { AppState, ExportOpts, BinaryFiles } from "../types";
@@ -22,6 +22,7 @@ export type ExportCB = (
 
 const JSONExportModal = ({
   elements,
+  layers,
   appState,
   files,
   actionManager,
@@ -31,6 +32,7 @@ const JSONExportModal = ({
   appState: AppState;
   files: BinaryFiles;
   elements: readonly NonDeletedExcalidrawElement[];
+  layers: readonly ExcalidrawLayer[];
   actionManager: ActionManager;
   onCloseRequest: () => void;
   exportOpts: ExportOpts;
@@ -73,14 +75,14 @@ const JSONExportModal = ({
               aria-label={t("exportDialog.link_button")}
               showAriaLabel={true}
               onClick={() => {
-                onExportToBackend(elements, appState, files, canvas);
+                onExportToBackend(elements, layers, appState, files, canvas);
                 trackEvent("export", "link", `ui (${getFrame()})`);
               }}
             />
           </Card>
         )}
         {exportOpts.renderCustomUI &&
-          exportOpts.renderCustomUI(elements, appState, files, canvas)}
+          exportOpts.renderCustomUI(elements, layers, appState, files, canvas)}
       </div>
     </div>
   );
@@ -88,6 +90,7 @@ const JSONExportModal = ({
 
 export const JSONExportDialog = ({
   elements,
+  layers,
   appState,
   files,
   actionManager,
@@ -96,6 +99,7 @@ export const JSONExportDialog = ({
   setAppState,
 }: {
   elements: readonly NonDeletedExcalidrawElement[];
+  layers: readonly ExcalidrawLayer[];
   appState: AppState;
   files: BinaryFiles;
   actionManager: ActionManager;
@@ -113,6 +117,7 @@ export const JSONExportDialog = ({
         <Dialog onCloseRequest={handleClose} title={t("buttons.export")}>
           <JSONExportModal
             elements={elements}
+            layers={layers}
             appState={appState}
             files={files}
             actionManager={actionManager}

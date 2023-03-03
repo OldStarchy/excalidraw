@@ -3,7 +3,7 @@ import {
   copyTextToSystemClipboard,
 } from "../clipboard";
 import { DEFAULT_EXPORT_PADDING, isFirefox, MIME_TYPES } from "../constants";
-import { NonDeletedExcalidrawElement } from "../element/types";
+import { ExcalidrawLayer, NonDeletedExcalidrawElement } from "../element/types";
 import { t } from "../i18n";
 import { exportToCanvas, exportToSvg } from "../scene/export";
 import { ExportType } from "../scene/types";
@@ -18,6 +18,7 @@ export { loadFromJSON, saveAsJSON } from "./json";
 export const exportCanvas = async (
   type: Omit<ExportType, "backend">,
   elements: readonly NonDeletedExcalidrawElement[],
+  layers: readonly ExcalidrawLayer[],
   appState: AppState,
   files: BinaryFiles,
   {
@@ -40,6 +41,7 @@ export const exportCanvas = async (
   if (type === "svg" || type === "clipboard-svg") {
     const tempSvg = await exportToSvg(
       elements,
+      layers,
       {
         exportBackground,
         exportWithDarkMode: appState.exportWithDarkMode,
@@ -66,7 +68,7 @@ export const exportCanvas = async (
     }
   }
 
-  const tempCanvas = await exportToCanvas(elements, appState, files, {
+  const tempCanvas = await exportToCanvas(elements, layers, appState, files, {
     exportBackground,
     viewBackgroundColor,
     exportPadding,
@@ -82,7 +84,7 @@ export const exportCanvas = async (
         await import(/* webpackChunkName: "image" */ "./image")
       ).encodePngMetadata({
         blob,
-        metadata: serializeAsJSON(elements, appState, files, "local"),
+        metadata: serializeAsJSON(elements, layers, appState, files, "local"),
       });
     }
 

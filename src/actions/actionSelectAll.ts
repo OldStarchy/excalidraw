@@ -9,7 +9,7 @@ import { LinearElementEditor } from "../element/linearElementEditor";
 export const actionSelectAll = register({
   name: "selectAll",
   trackEvent: { category: "canvas" },
-  perform: (elements, appState, value, app) => {
+  perform: (elements, _layers, appState, value, app) => {
     if (appState.editingLinearElement) {
       return false;
     }

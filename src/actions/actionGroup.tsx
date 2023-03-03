@@ -55,7 +55,7 @@ const enableActionGroup = (
 export const actionGroup = register({
   name: "group",
   trackEvent: { category: "element" },
-  perform: (elements, appState) => {
+  perform: (elements, _layers, appState) => {
     const selectedElements = getSelectedElements(
       getNonDeletedElements(elements),
       appState,
@@ -129,7 +129,8 @@ export const actionGroup = register({
     };
   },
   contextItemLabel: "labels.group",
-  predicate: (elements, appState) => enableActionGroup(elements, appState),
+  predicate: (elements, _layers, appState) =>
+    enableActionGroup(elements, appState),
   keyTest: (event) =>
     !event.shiftKey && event[KEYS.CTRL_OR_CMD] && event.key === KEYS.G,
   PanelComponent: ({ elements, appState, updateData }) => (
@@ -148,7 +149,7 @@ export const actionGroup = register({
 export const actionUngroup = register({
   name: "ungroup",
   trackEvent: { category: "element" },
-  perform: (elements, appState) => {
+  perform: (elements, _layers, appState) => {
     const groupIds = getSelectedGroupIds(appState);
     if (groupIds.length === 0) {
       return { appState, elements, commitToHistory: false };
@@ -192,7 +193,8 @@ export const actionUngroup = register({
     event[KEYS.CTRL_OR_CMD] &&
     event.key === KEYS.G.toUpperCase(),
   contextItemLabel: "labels.ungroup",
-  predicate: (elements, appState) => getSelectedGroupIds(appState).length > 0,
+  predicate: (elements, _layers, appState) =>
+    getSelectedGroupIds(appState).length > 0,
 
   PanelComponent: ({ elements, appState, updateData }) => (
     <ToolButton
